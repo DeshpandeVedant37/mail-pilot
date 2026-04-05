@@ -1,0 +1,781 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MailPilot — Profile</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand-500: #3b82f6;
+      --brand-600: #2563eb;
+      --gradient-brand: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+      --gradient-sky:   linear-gradient(180deg, #e0f0ff 0%, #f0f7ff 40%, #ffffff 100%);
+      --gradient-dark:  linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
+      --gray-50:  #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-400: #9ca3af;
+      --gray-500: #6b7280;
+      --gray-600: #4b5563;
+      --gray-700: #374151;
+      --gray-800: #1f2937;
+      --gray-900: #111827;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-body:    'Inter', sans-serif;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--gradient-sky);
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      color: var(--gray-800);
+    }
+
+    /* blobs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(90px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    body::before { width: 600px; height: 600px; background: rgba(59,130,246,0.09); top: -150px; left: -150px; }
+    body::after  { width: 500px; height: 500px; background: rgba(6,182,212,0.08);  bottom: -100px; right: -100px; }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 0 clamp(20px, 4vw, 60px);
+      background: rgba(255,255,255,0.75);
+      backdrop-filter: blur(20px) saturate(1.8);
+      -webkit-backdrop-filter: blur(20px) saturate(1.8);
+      box-shadow: 0 1px 0 rgba(0,0,0,0.05);
+    }
+    .nav-inner {
+      max-width: 1200px; margin: 0 auto; height: 64px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-brand {
+      display: flex; align-items: center; gap: 10px;
+      font-family: var(--font-display); font-weight: 700; font-size: 1.1rem;
+      color: var(--gray-900); text-decoration: none;
+    }
+    .nav-brand img { width: 36px; height: 36px; object-fit: contain; }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-back {
+      font-size: 0.82rem; font-weight: 600; color: var(--gray-500);
+      text-decoration: none; display: flex; align-items: center; gap: 5px;
+      transition: color 0.2s;
+    }
+    .nav-back:hover { color: var(--gray-900); }
+    .nav-logout-btn {
+      font-size: 0.82rem; font-weight: 600; color: var(--gray-500);
+      background: none; border: 1.5px solid var(--gray-200); border-radius: 99px;
+      padding: 6px 16px; cursor: pointer; transition: color 0.2s, border-color 0.2s;
+    }
+    .nav-logout-btn:hover { color: var(--gray-900); border-color: var(--gray-400); }
+
+    /* ── Page layout ── */
+    .page {
+      position: relative; z-index: 1;
+      max-width: 1100px; margin: 0 auto;
+      padding: 96px 24px 60px;
+    }
+
+    /* ── Profile hero ── */
+    .profile-hero {
+      display: flex; align-items: center; gap: 28px;
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: 24px; padding: 36px 40px;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.06);
+      margin-bottom: 32px;
+      animation: fadeUp 0.5s ease both;
+    }
+    .profile-avatar-lg {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: var(--gradient-brand);
+      color: #fff; font-family: var(--font-display);
+      font-weight: 700; font-size: 2rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 20px rgba(59,130,246,0.35);
+    }
+    .profile-info { flex: 1; }
+    .profile-name {
+      font-family: var(--font-display); font-size: 1.6rem;
+      font-weight: 700; color: var(--gray-900); letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+    .profile-email { font-size: 0.9rem; color: var(--gray-500); margin-bottom: 10px; }
+    .profile-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.15);
+      color: var(--brand-600); font-size: 0.75rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 99px;
+    }
+    .profile-badge-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--brand-500);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    .profile-joined { font-size: 0.78rem; color: var(--gray-400); margin-top: 8px; }
+
+    .profile-extra {
+      display: flex; gap: 20px; flex-wrap: wrap; margin-top: 10px;
+    }
+    .profile-extra-item {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; color: var(--gray-500);
+    }
+    .profile-extra-item svg { width: 14px; height: 14px; stroke: var(--gray-400); flex-shrink: 0; }
+
+    .btn-edit {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-body); font-size: 0.85rem; font-weight: 600;
+      color: var(--brand-600); background: rgba(59,130,246,0.08);
+      border: 1.5px solid rgba(59,130,246,0.2); border-radius: 99px;
+      padding: 8px 18px; cursor: pointer;
+      transition: background 0.2s, border-color 0.2s, transform 0.2s;
+      margin-top: 14px;
+    }
+    .btn-edit svg { width: 14px; height: 14px; stroke: var(--brand-600); }
+    .btn-edit:hover { background: rgba(59,130,246,0.14); border-color: rgba(59,130,246,0.4); transform: translateY(-1px); }
+
+    /* ── Edit Modal ── */
+    .modal-backdrop {
+      position: fixed; inset: 0; z-index: 500;
+      background: rgba(15,23,42,0.45);
+      backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 24px;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .modal-backdrop.open { opacity: 1; pointer-events: all; }
+
+    .modal {
+      background: #fff; border-radius: 24px;
+      padding: 36px 36px 32px; width: 100%; max-width: 460px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+      transform: translateY(20px) scale(0.97);
+      transition: transform 0.28s cubic-bezier(0.25,0,0.1,1);
+    }
+    .modal-backdrop.open .modal { transform: translateY(0) scale(1); }
+
+    .modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 24px;
+    }
+    .modal-title {
+      font-family: var(--font-display); font-size: 1.2rem;
+      font-weight: 700; color: var(--gray-900);
+    }
+    .modal-close {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--gray-100); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: var(--gray-200); }
+    .modal-close svg { width: 16px; height: 16px; stroke: var(--gray-600); }
+
+    .modal-form { display: flex; flex-direction: column; gap: 18px; }
+    .modal-group { display: flex; flex-direction: column; gap: 6px; }
+    .modal-group label {
+      font-size: 0.8rem; font-weight: 600;
+      color: var(--gray-700); letter-spacing: 0.02em;
+    }
+    .modal-group input, .modal-group textarea {
+      font-family: var(--font-body); font-size: 0.92rem; color: var(--gray-800);
+      background: var(--gray-50); border: 1.5px solid var(--gray-200);
+      border-radius: 12px; padding: 11px 14px; outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s; resize: none;
+    }
+    .modal-group input:focus, .modal-group textarea:focus {
+      border-color: var(--brand-500);
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.12);
+    }
+    .modal-group input[disabled] {
+      opacity: 0.55; cursor: not-allowed; background: var(--gray-100);
+    }
+    .modal-hint { font-size: 0.73rem; color: var(--gray-400); margin-top: 2px; }
+
+    .modal-actions { display: flex; gap: 10px; margin-top: 4px; }
+    .btn-save {
+      flex: 1; padding: 12px; border: none; border-radius: 12px;
+      background: var(--gradient-brand); color: #fff;
+      font-family: var(--font-body); font-size: 0.92rem; font-weight: 600;
+      cursor: pointer; box-shadow: 0 4px 16px rgba(59,130,246,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 24px rgba(59,130,246,0.4); }
+    .btn-save:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-cancel {
+      padding: 12px 20px; border: 1.5px solid var(--gray-200); border-radius: 12px;
+      background: none; color: var(--gray-600);
+      font-family: var(--font-body); font-size: 0.92rem; font-weight: 600;
+      cursor: pointer; transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-cancel:hover { border-color: var(--gray-400); color: var(--gray-900); }
+
+    .modal-msg {
+      font-size: 0.8rem; font-weight: 500; padding: 9px 13px;
+      border-radius: 9px; display: none; margin-top: -6px;
+    }
+    .modal-msg.success { background: #f0fdf4; color: #16a34a; border: 1px solid #bbf7d0; display: block; }
+    .modal-msg.error   { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; display: block; }
+
+    /* ── Section label ── */
+    .section-label {
+      font-family: var(--font-display); font-size: 0.72rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--brand-500); margin-bottom: 16px;
+    }
+
+    /* ── Dashboard cards ── */
+    .dash-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 32px;
+    }
+
+    .dash-card {
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: 20px; padding: 28px 24px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+      display: flex; flex-direction: column; gap: 12px;
+      opacity: 0; transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease, box-shadow 0.3s;
+    }
+    .dash-card.visible { opacity: 1; transform: translateY(0); }
+    .dash-card:nth-child(1) { transition-delay: 0s; }
+    .dash-card:nth-child(2) { transition-delay: 0.08s; }
+    .dash-card:nth-child(3) { transition-delay: 0.16s; }
+    .dash-card:nth-child(4) { transition-delay: 0.24s; }
+    .dash-card:hover {
+      box-shadow: 0 8px 32px rgba(59,130,246,0.1);
+      transform: translateY(-4px);
+    }
+
+    .dash-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .dash-icon svg { width: 22px; height: 22px; }
+
+    .dash-icon.blue   { background: rgba(59,130,246,0.12); }
+    .dash-icon.green  { background: rgba(16,185,129,0.12); }
+    .dash-icon.purple { background: rgba(139,92,246,0.12); }
+    .dash-icon.red    { background: rgba(239,68,68,0.1); }
+
+    .dash-icon.blue   svg { stroke: #3b82f6; }
+    .dash-icon.green  svg { stroke: #10b981; }
+    .dash-icon.purple svg { stroke: #8b5cf6; }
+    .dash-icon.red    svg { stroke: #ef4444; }
+
+    .dash-value {
+      font-family: var(--font-display); font-size: 2.4rem;
+      font-weight: 800; letter-spacing: -0.03em;
+      color: var(--gray-900); line-height: 1;
+    }
+    .dash-card:nth-child(4) .dash-value { color: #ef4444; }
+
+    .dash-label {
+      font-size: 0.82rem; font-weight: 600; color: var(--gray-500);
+    }
+    .dash-trend {
+      font-size: 0.75rem; font-weight: 500; color: var(--gray-400);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .dash-trend.up   { color: #10b981; }
+    .dash-trend.down { color: #ef4444; }
+
+    /* ── Activity Log ── */
+    .log-wrap {
+      background: rgba(255,255,255,0.82);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.9);
+      border-radius: 20px;
+      box-shadow: 0 2px 16px rgba(0,0,0,0.04);
+      overflow: hidden;
+      animation: fadeUp 0.6s 0.3s ease both;
+    }
+    .log-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 28px; border-bottom: 1px solid var(--gray-100);
+    }
+    .log-title {
+      font-family: var(--font-display); font-size: 1rem;
+      font-weight: 700; color: var(--gray-900);
+    }
+    .log-count {
+      font-size: 0.75rem; font-weight: 600; color: var(--gray-400);
+      background: var(--gray-100); padding: 3px 10px; border-radius: 99px;
+    }
+    .log-list { max-height: 380px; overflow-y: auto; }
+    .log-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 28px; border-bottom: 1px solid var(--gray-100);
+      transition: background 0.15s;
+      animation: fadeUp 0.35s ease both;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-item:hover { background: rgba(59,130,246,0.03); }
+
+    .log-dot-wrap {
+      display: flex; flex-direction: column; align-items: center;
+      padding-top: 4px; flex-shrink: 0;
+    }
+    .log-dot {
+      width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0;
+    }
+    .log-dot.email    { background: #3b82f6; }
+    .log-dot.meeting  { background: #10b981; }
+    .log-dot.update   { background: #8b5cf6; }
+    .log-dot.error    { background: #ef4444; }
+    .log-dot.system   { background: #9ca3af; }
+
+    .log-body { flex: 1; }
+    .log-action { font-size: 0.88rem; font-weight: 500; color: var(--gray-800); }
+    .log-time   { font-size: 0.75rem; color: var(--gray-400); margin-top: 2px; }
+
+    .log-empty {
+      text-align: center; padding: 48px 24px;
+      color: var(--gray-400); font-size: 0.88rem;
+    }
+
+    /* ── Loading skeleton ── */
+    .skeleton {
+      background: linear-gradient(90deg, var(--gray-100) 25%, var(--gray-200) 50%, var(--gray-100) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+      border-radius: 8px;
+    }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.7); }
+    }
+
+    /* ── Redirect overlay ── */
+    .auth-guard {
+      position: fixed; inset: 0; z-index: 9999;
+      background: #fff; display: flex; align-items: center;
+      justify-content: center; flex-direction: column; gap: 16px;
+    }
+    .auth-guard.hidden { display: none; }
+    .auth-guard p { font-size: 0.9rem; color: var(--gray-500); }
+
+    @media (max-width: 900px) {
+      .dash-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .dash-grid { grid-template-columns: 1fr; }
+      .profile-hero { flex-direction: column; text-align: center; padding: 28px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Auth guard overlay -->
+  <div class="auth-guard" id="authGuard">
+    <img src="Product Logo/MailPilot Logo.png" width="56" height="56" style="object-fit:contain" />
+    <p>Checking authentication…</p>
+  </div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-brand">
+        <img src="Product Logo/MailPilot Logo.png" alt="MailPilot" />
+        <span>MailPilot</span>
+      </a>
+      <div class="nav-right">
+        <a href="index.html" class="nav-back">← Back to Home</a>
+        <button class="nav-logout-btn" id="logoutBtn">Sign Out</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="page">
+
+    <!-- Profile Hero -->
+    <div class="profile-hero" id="profileHero">
+      <div class="profile-avatar-lg" id="profileAvatar"></div>
+      <div class="profile-info">
+        <div class="profile-name" id="profileName">—</div>
+        <div class="profile-email" id="profileEmail">—</div>
+        <div class="profile-badge">
+          <span class="profile-badge-dot"></span> Active Account
+        </div>
+        <div class="profile-extra" id="profileExtra"></div>
+        <div class="profile-joined" id="profileJoined"></div>
+        <button class="btn-edit" id="editProfileBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          Edit Profile
+        </button>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="section-label">AI Agent Dashboard</div>
+    <div class="dash-grid" id="dashGrid">
+
+      <!-- Emails Processed -->
+      <div class="dash-card" id="cardEmails">
+        <div class="dash-icon blue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="dash-value" id="emails-processed">—</div>
+        <div class="dash-label">Emails Processed</div>
+        <div class="dash-trend up" id="trendEmails">↑ Loading…</div>
+      </div>
+
+      <!-- Meetings Scheduled -->
+      <div class="dash-card" id="cardMeetings">
+        <div class="dash-icon green">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <rect x="3" y="4" width="18" height="18" rx="2" stroke-linecap="round"/>
+            <path d="M16 2v4M8 2v4M3 10h18" stroke-linecap="round"/>
+            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01" stroke-linecap="round" stroke-width="2"/>
+          </svg>
+        </div>
+        <div class="dash-value" id="meetings-scheduled">—</div>
+        <div class="dash-label">Meetings Scheduled</div>
+        <div class="dash-trend up" id="trendMeetings">↑ Loading…</div>
+      </div>
+
+      <!-- Updates Summarized -->
+      <div class="dash-card" id="cardUpdates">
+        <div class="dash-icon purple">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M9 12h6M9 16h6M9 8h6M5 3h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="dash-value" id="updates-summarized">—</div>
+        <div class="dash-label">Updates Summarized</div>
+        <div class="dash-trend up" id="trendUpdates">↑ Loading…</div>
+      </div>
+
+      <!-- Errors -->
+      <div class="dash-card" id="cardErrors">
+        <div class="dash-icon red">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+            <path d="M12 9v4M12 17h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="dash-value" id="errors">—</div>
+        <div class="dash-label">Errors</div>
+        <div class="dash-trend down" id="trendErrors">↓ Loading…</div>
+      </div>
+
+    </div>
+
+    <!-- Activity Log -->
+    <div class="section-label">Agent Activity Log</div>
+    <div class="log-wrap">
+      <div class="log-header">
+        <span class="log-title">Recent Activity</span>
+        <span class="log-count" id="logCount">0 entries</span>
+      </div>
+      <div class="log-list" id="activity-feed">
+        <div class="log-empty">Loading activity…</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Edit Profile Modal -->
+  <div class="modal-backdrop" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <span class="modal-title">Edit Profile</span>
+        <button class="modal-close" id="modalClose">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round">
+            <path d="M18 6L6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+      <div class="modal-msg" id="modalMsg"></div>
+      <div class="modal-form">
+        <div class="modal-group">
+          <label for="editName">Full Name</label>
+          <input type="text" id="editName" placeholder="Your full name" />
+        </div>
+        <div class="modal-group">
+          <label for="editEmail">Email Address</label>
+          <input type="email" id="editEmail" disabled />
+          <span class="modal-hint">Email cannot be changed here.</span>
+        </div>
+        <div class="modal-group">
+          <label for="editAge">Age</label>
+          <input type="number" id="editAge" placeholder="e.g. 25" min="1" max="120" />
+        </div>
+        <div class="modal-group">
+          <label for="editAddress">Address</label>
+          <textarea id="editAddress" rows="3" placeholder="Your address"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel" id="modalCancel">Cancel</button>
+          <button class="btn-save" id="modalSave">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { onAuthChange, logOut, getUserDashboard, getActivityLog, updateUserProfile, getUserProfile } from './auth.js';
+
+    const guard = document.getElementById('authGuard');
+    let currentUser = null;
+
+    // ── Auth gate ──
+    onAuthChange(async user => {
+      if (!user) { window.location.href = 'login.html'; return; }
+      currentUser = user;
+      guard.classList.add('hidden');
+      const extra = await getUserProfile(user.uid);
+      renderProfile(user, extra);
+      await loadDashboard(user.uid);
+      await loadActivityLog(user.uid);
+    });
+
+    document.getElementById('logoutBtn').addEventListener('click', async () => {
+      await logOut();
+      window.location.href = 'index.html';
+    });
+
+    // ── Render profile ──
+    function renderProfile(user, extra = {}) {
+      const name  = extra.name || user.displayName || user.email.split('@')[0];
+      const initial = name.charAt(0).toUpperCase();
+
+      document.getElementById('profileAvatar').textContent = initial;
+      document.getElementById('profileName').textContent   = name;
+      document.getElementById('profileEmail').textContent  = user.email;
+
+      // Extra fields
+      const extraEl = document.getElementById('profileExtra');
+      extraEl.innerHTML = '';
+      if (extra.age) {
+        extraEl.innerHTML += `
+          <div class="profile-extra-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round">
+              <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+            Age: ${extra.age}
+          </div>`;
+      }
+      if (extra.address) {
+        extraEl.innerHTML += `
+          <div class="profile-extra-item">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
+            ${extra.address}
+          </div>`;
+      }
+
+      if (user.metadata?.creationTime) {
+        const d = new Date(user.metadata.creationTime);
+        document.getElementById('profileJoined').textContent =
+          'Member since ' + d.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+      }
+    }
+
+    // ── Edit modal ──
+    const modal      = document.getElementById('editModal');
+    const modalMsg   = document.getElementById('modalMsg');
+    const saveBtn    = document.getElementById('modalSave');
+
+    async function openModal() {
+      const extra = await getUserProfile(currentUser.uid);
+      const name  = extra.name || currentUser.displayName || currentUser.email.split('@')[0];
+      document.getElementById('editName').value    = name;
+      document.getElementById('editEmail').value   = currentUser.email;
+      document.getElementById('editAge').value     = extra.age || '';
+      document.getElementById('editAddress').value = extra.address || '';
+      modalMsg.className = 'modal-msg';
+      modal.classList.add('open');
+    }
+
+    function closeModal() { modal.classList.remove('open'); }
+
+    document.getElementById('editProfileBtn').addEventListener('click', openModal);
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalCancel').addEventListener('click', closeModal);
+    modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+    saveBtn.addEventListener('click', async () => {
+      const name    = document.getElementById('editName').value.trim();
+      const age     = document.getElementById('editAge').value.trim();
+      const address = document.getElementById('editAddress').value.trim();
+
+      if (!name) {
+        modalMsg.textContent = 'Name cannot be empty.';
+        modalMsg.className = 'modal-msg error';
+        return;
+      }
+      if (age && (isNaN(age) || +age < 1 || +age > 120)) {
+        modalMsg.textContent = 'Please enter a valid age (1–120).';
+        modalMsg.className = 'modal-msg error';
+        return;
+      }
+
+      saveBtn.disabled = true;
+      saveBtn.textContent = 'Saving…';
+      modalMsg.className = 'modal-msg';
+
+      try {
+        await updateUserProfile(currentUser.uid, { name, age: age ? +age : null, address });
+        const extra = await getUserProfile(currentUser.uid);
+        renderProfile(currentUser, extra);
+        modalMsg.textContent = 'Profile updated successfully!';
+        modalMsg.className = 'modal-msg success';
+        setTimeout(closeModal, 1200);
+      } catch (err) {
+        modalMsg.textContent = 'Failed to save. Please try again.';
+        modalMsg.className = 'modal-msg error';
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.textContent = 'Save Changes';
+      }
+    });
+
+    // ── Dashboard ──
+    async function loadDashboard(uid) {
+      const data = await getUserDashboard(uid);
+      animateCount('emails-processed',   data.emailsProcessed   || 0);
+      animateCount('meetings-scheduled', data.meetingsScheduled || 0);
+      animateCount('updates-summarized', data.updatesSummarized || 0);
+      animateCount('errors',             data.errors            || 0);
+      document.getElementById('trendEmails').textContent   = `↑ ${data.emailsProcessed   || 0} total processed`;
+      document.getElementById('trendMeetings').textContent = `↑ ${data.meetingsScheduled || 0} total scheduled`;
+      document.getElementById('trendUpdates').textContent  = `↑ ${data.updatesSummarized || 0} total summarized`;
+      document.getElementById('trendErrors').textContent   = data.errors > 0 ? `↑ ${data.errors} need attention` : '✓ No active errors';
+      if (data.errors === 0) document.getElementById('trendErrors').className = 'dash-trend up';
+      document.querySelectorAll('.dash-card').forEach((c, i) => setTimeout(() => c.classList.add('visible'), i * 80));
+    }
+
+    function animateCount(id, target) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (target === 0) { el.textContent = '0'; return; }
+      const start = performance.now();
+      (function step(now) {
+        const p = Math.min((now - start) / 900, 1);
+        el.textContent = Math.round(p * target);
+        if (p < 1) requestAnimationFrame(step);
+      })(performance.now());
+    }
+
+    // ── Activity Log ──
+    async function loadActivityLog(uid) {
+      const logs  = await getActivityLog(uid);
+      const list  = document.getElementById('activity-feed');
+      const count = document.getElementById('logCount');
+      if (!logs.length) {
+        list.innerHTML = '<div class="log-empty">No activity recorded yet. Your AI agent actions will appear here.</div>';
+        count.textContent = '0 entries';
+        return;
+      }
+      count.textContent = `${logs.length} entr${logs.length === 1 ? 'y' : 'ies'}`;
+      list.innerHTML = '';
+      logs.forEach((entry, i) => {
+        const item = document.createElement('div');
+        item.className = 'log-item';
+        item.style.animationDelay = `${i * 40}ms`;
+        const type = entry.type || 'system';
+        const time = entry.timestamp?.toDate
+          ? entry.timestamp.toDate().toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })
+          : 'Just now';
+        item.innerHTML = `
+          <div class="log-dot-wrap"><span class="log-dot ${type}"></span></div>
+          <div class="log-body">
+            <div class="log-action">${entry.action || 'Agent action recorded'}</div>
+            <div class="log-time">${time}</div>
+          </div>`;
+        list.appendChild(item);
+      });
+    }
+
+    // ── Stats API polling ──
+    function renderStatsApi(data) {
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('emails-processed',   data.emails_processed   ?? data.emailsProcessed   ?? 0);
+  set('meetings-scheduled', data.meetings_scheduled ?? data.meetingsScheduled ?? 0);
+  set('updates-summarized', data.updates_summarized ?? data.updatesSummarized ?? data.summaries ?? 0);
+  set('errors',             data.errors             ?? 0);
+
+  const feed  = document.getElementById('activity-feed');
+  const count = document.getElementById('logCount');
+  const items = data.recent_activity || [];
+  count.textContent = `${items.length} entr${items.length === 1 ? 'y' : 'ies'}`;
+  if (!items.length) {
+    feed.innerHTML = '<div class="log-empty">No activity recorded yet.</div>';
+    return;
+  }
+  feed.innerHTML = items.map(e => {
+    const borderColor = e.status === 'success' ? '#10b981' : e.status === 'error' ? '#ef4444' : '#3b82f6';
+
+    let detailText = '';
+    let calLink = '';
+    if (e.detail && e.detail.includes('|')) {
+      const parts = e.detail.split('|');
+      detailText = parts[0].trim();
+      calLink = parts[1].trim();
+    } else {
+      detailText = e.detail || '';
+    }
+
+    return `<div class="log-item" style="border-left:3px solid ${borderColor}; cursor:${calLink ? 'pointer' : 'default'};"
+      ${calLink ? `onclick="window.open('${calLink}', '_blank')"` : ''}>
+      <div class="log-body">
+        <div class="log-action">${e.action}${calLink ? ' 🔗' : ''}</div>
+        ${detailText ? `<div style="font-size:0.82rem;color:var(--gray-500);margin-top:4px;line-height:1.5;">${detailText}</div>` : ''}
+        <div class="log-time">${e.time}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+    async function fetchStatsApi() {
+      try {
+        const res = await fetch('http://10.1.120.59:8002/stats');
+        if (!res.ok) return;
+        const data = await res.json();
+        console.log('Stats API response:', data);
+        renderStatsApi(data);
+      } catch (e) { console.warn('Stats API error:', e); }
+    }
+
+    fetchStatsApi();
+    setInterval(fetchStatsApi, 10000);
+  </script>
+
+</body>
+</html>
