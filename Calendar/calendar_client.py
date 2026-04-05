@@ -58,7 +58,7 @@ def _make_idempotency_key(summary, start_iso, attendee_emails):
 
 def find_duplicate_event(summary, start_dt, attendee_emails, lookahead_minutes=60):
     service = get_service()
-    
+
     window_start = (start_dt - timedelta(minutes=lookahead_minutes)).astimezone(timezone.utc)
     window_end = (start_dt + timedelta(minutes=lookahead_minutes)).astimezone(timezone.utc)
 
@@ -71,7 +71,6 @@ def find_duplicate_event(summary, start_dt, attendee_emails, lookahead_minutes=6
     ).execute()
 
     for event in events_result.get("items", []):
-        # Check time overlap only — ignore title
         event_start = event.get("start", {}).get("dateTime", "")
         if not event_start:
             continue
@@ -81,6 +80,7 @@ def find_duplicate_event(summary, start_dt, attendee_emails, lookahead_minutes=6
             return event["id"]
 
     return None
+
 def create_event(summary, start_dt, end_dt, attendee_emails, description="", timezone_str="UTC", send_updates="all"):
     service = get_service()
 
@@ -96,16 +96,9 @@ def create_event(summary, start_dt, end_dt, attendee_emails, description="", tim
             "message": "Event already exists — skipped creation.",
         }
 
-    ai_disclaimer = (
-        "\n\n---\n"
-        "⚠️ This meeting invite was created by an AI email assistant. "
-        "If you have questions or believe this was sent in error, "
-        "please reply to the original email thread."
-    )
-
     event_body = {
         "summary": summary,
-        "description": (description + ai_disclaimer).strip(),
+        "description": description.strip(),
         "start": {"dateTime": start_dt.isoformat(), "timeZone": timezone_str},
         "end": {"dateTime": end_dt.isoformat(), "timeZone": timezone_str},
         "attendees": [{"email": email} for email in attendee_emails],
